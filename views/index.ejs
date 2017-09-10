@@ -1,0 +1,112 @@
+<%- include('header') %>
+  <script>
+  // if (annyang) {
+  //   // Let's define a command.
+  //   var commands = {
+  //     'hello': function() { alert('Hello world!'); }
+  //   };
+
+  //   // Add our commands to annyang
+  //   annyang.addCommands(commands);
+
+  //   // debug console speech recognized
+  //   // annyang.debug([newState=true]);
+
+  //   // annyang.addCallback('result', function(phrases) {
+  //   //   console.log('Speech recognized. Possible sentences said:');
+  //   //   console.log(phrases);
+  //   // });
+
+  //   // Start listening.
+  //   annyang.start({ autoRestart: true, continuous: true });
+  // }
+  </script>
+  <style type="text/css">
+
+  </style>
+  <div id="homepage">
+    <div class="row">
+      <div class="col-xs-12 col-sm-6">
+        <p id="word" class="text-center"><%= words[Math.floor(Math.random() * words.length)] %></p>
+        <p class="text-center"><i class="fa fa-refresh fa-2x reload_word"></i></p>
+        <button id="start-speak"><i class="fa fa-microphone"></i></button>
+      </div>
+
+      <div class="col-xs-12 col-sm-6">
+        <p class="text-center result">Your result</p>
+        <div class="pie_progress" role="progressbar">
+          <div class="pie_progress__number" style="color: #fff; z-index: 1;">0%</div>
+          <div class="pie_progress__label" style="color: #fff; z-index: 1;">Native Speaker</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const socket = io();
+    // socket.on('connect', function(data) {
+    //     socket.emit('join', 'Hello World from client');
+    // });
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+
+    recognition.lang = 'en-US';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    $('#start-speak').click(function() {
+      recognition.start();
+    });
+
+    recognition.addEventListener('speechstart', () => {
+      console.log('Speech has been detected.');
+    });
+
+    recognition.addEventListener('result', (e) => {
+      console.log('Result has been detected.');
+
+      let last = e.results.length - 1;
+      let text = e.results[last][0].transcript;
+
+      console.log(text);
+
+      // outputYou.textContent = text;
+      // console.log('Confidence: ' + e.results[0][0].confidence);
+
+      socket.emit('speaker_input', {
+        origin_word: $('#word').text(),
+        speaker_word: text
+      });
+    });
+
+    recognition.addEventListener('speechend', () => {
+      recognition.stop();
+    });
+
+    socket.on('compare_return', function(string_distance) {
+      $('.pie_progress').asPieProgress('go', Math.floor(string_distance * 100));
+    });
+
+    // recognition.addEventListener('error', (e) => {
+    //   outputBot.textContent = 'Error: ' + e.error;
+    // });
+
+    jQuery(function($) {
+      $('.pie_progress').asPieProgress({
+        namespace: 'pie_progress',
+        barcolor: '#e67e22',
+        barsize: '15',
+        speed: 50,
+        easing: 'ease',
+        trackcolor: '#fff',
+        fillcolor: '#34495e',
+      });
+
+      $(document).on('click', '.reload_word', function() {
+        var words = "<%= words %>".split(',');
+        $('#word').text(words[Math.floor(Math.random() * words.length)]);
+        $('.pie_progress').asPieProgress('reset');
+      });
+    });
+  </script>
+<%- include('footer') %>

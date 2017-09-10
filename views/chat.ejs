@@ -1,0 +1,95 @@
+<%- include('header') %>
+  <div id="speakbot">
+    <div class="row">
+      <section class="section">
+        <!-- <div class="nomessages">
+          <img src="/images/unnamed.jpg" id="noMessagesImage" />
+          <div class="info">
+            <h2>You are speaking with Mr.Bot.</h2>
+            <h5>Send them a message from the form below!</h5>
+          </div>
+        </div> -->
+
+        <!-- CHAT -->
+        <div class="col-md-8 col-md-offset-2">
+          <div class="card-box">
+            <h4 class="m-t-0 m-b-20 header-title text-center"><b>Chat</b></h4>
+
+            <div class="chat-conversation">
+              <ul class="conversation-list nicescroll">
+                <!-- chat conversation -->
+              </ul>
+              <!-- <div class="row">
+                <div class="col-sm-9 chat-inputbar">
+                  <input type="text" class="form-control chat-input" placeholder="Enter your text">
+                </div>
+                <div class="col-sm-3 chat-send">
+                  <button type="submit" class="btn btn-md btn-info btn-block waves-effect waves-light">Send</button>
+                </div>
+              </div> -->
+            </div>
+          </div>
+        </div> <!-- end col-->
+
+      </section>
+    </div>
+
+    <footer>
+      <button id="start-speak"><i class="fa fa-microphone"></i></button>
+    </footer>
+  </div>
+  <!-- chat  -->
+  <script src="/vendor/ubold/assets/plugins/moment/moment.js"></script>
+  <script src="/vendor/ubold/assets/pages/jquery.chat.js"></script>
+  <script>
+    const socket = io();
+    // socket.on('connect', function(data) {
+    //     socket.emit('join', 'Hello World from client');
+    // });
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+
+    recognition.lang = 'en-US';
+    // recognition.interimResults = false;
+    // recognition.maxAlternatives = 1;
+    recognition.continuous = true;
+    recognition.interimResults = false;
+
+    $('#start-speak').click(function() {
+      recognition.start();
+    });
+
+    recognition.addEventListener('speechstart', () => {
+      console.log('Speech has been detected.');
+    });
+
+    recognition.addEventListener('result', (e) => {
+      console.log('Result has been detected.');
+
+      let last = e.results.length - 1;
+      let text = e.results[last][0].transcript;
+
+      console.log(text);
+      // socket.emit('speaker_input', {
+      //   user_text: text
+      // });
+      // $.ChatApp.user_save(text);
+    });
+
+    $('button').click(function() {
+      $.ChatApp.user_save($('.chat-input').val());
+      socket.emit('user_speak', {
+        user_text: $('.chat-input').val()
+      });
+    });
+
+    socket.on('bot_speak', function(data) {
+      $.ChatApp.bot_save(data);
+    });
+
+    // recognition.addEventListener('speechend', () => {
+    //   recognition.stop();
+    // });
+  </script>
+<%- include('footer') %>

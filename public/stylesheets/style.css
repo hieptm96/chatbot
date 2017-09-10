@@ -1,0 +1,166 @@
+#homepage button {
+  display: block;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  width: 150px;
+  height: 150px;
+  border: 0;
+  border-radius: 50%;
+  padding: .7em 1em;
+  /*margin: 4em auto 3em;*/
+  margin-left: calc(50% - 75px);
+  margin-top: 5em;
+  text-align: center;
+  color: #fff;
+  background: linear-gradient(180deg, #39C2C9 0%, #3FC8C9 80%, #3FC8C9 100%);
+  box-shadow: 2px 5px 30px rgba(63, 200, 201, .4);
+
+  will-change: transform, filter;
+  transition: all 0.3s ease-out;
+}
+#homepage button .fa {
+  font-size: 100px;
+  line-height: 150px;
+  margin: 0;
+  text-shadow: 1px 2px 2px #2a8b90;
+}
+#homepage button:hover {
+  transform: scale(.92);
+  cursor: pointer;
+}
+#homepage button:active {
+  filter: brightness(.8);
+}
+#homepage button:focus {
+  outline: 0;
+}
+
+#homepage #word {
+  font-size: 30px;
+  margin-top: 15px;
+  text-transform: uppercase;
+}
+
+#homepage .result {
+  font-size: 30px;
+  margin-top: 15px;
+  text-transform: uppercase;
+}
+#homepage .reload_word:hover {
+  cursor: pointer;
+}
+
+/*progress*/
+#homepage .pie_progress {
+  width: 300px;
+  margin: 10px auto;
+}
+@media all and (max-width: 768px) {
+  #homepage .pie_progress {
+    width: 80%;
+    max-width: 300px;
+  }
+}
+
+body {
+  background-color: #f0f1f3;
+  color:#667073;
+  font: 16px/1.3 'Arial',sans-serif;
+}
+/* ------------ Footer styles ------------ */
+
+footer {
+  position:fixed;
+  bottom:0;
+  left:0;
+  width:100%;
+  padding-top: 20px;
+  /*background-color: white;*/
+  height: 155px;
+}
+#speakbot footer button {
+  display: block;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  width: 120px;
+  height: 120px;
+  border: 0;
+  border-radius: 50%;
+  padding: .7em 1em;
+  margin-left: calc(50% - 60px);
+  text-align: center;
+  color: #fff;
+  background: linear-gradient(180deg, #39C2C9 0%, #3FC8C9 80%, #3FC8C9 100%);
+  box-shadow: 2px 5px 30px rgba(63, 200, 201, .4);
+
+  will-change: transform, filter;
+  transition: all 0.3s ease-out;
+}
+#speakbot footer button .fa {
+  font-size: 70px;
+  line-height: 120px;
+  margin: 0;
+  text-shadow: 1px 2px 2px #2a8b90;
+}
+#speakbot footer button:hover {
+  transform: scale(.92);
+  cursor: pointer;
+}
+#speakbot footer button:active {
+  filter: brightness(.8);
+}
+#speakbot footer button:focus {
+  outline: 0;
+}
+
+#speakbot .card-box {
+  margin-top: 10px;
+}
+/* ------ No Messages ------ */
+.nomessages {
+  text-align:center;
+  display: block;
+  margin:0px auto;
+  width: 750px;
+  height: 300px;
+  background-color: #ffffff;
+  border-radius: 3px;
+  box-shadow:0px 3px 3px #e3e4e6;
+  color: #637277;
+  margin-bottom: 400px;
+}
+.nomessages h2 {
+  padding-top: 50px;
+  overflow: hidden;
+  padding-bottom: 6px;
+}
+.nomessages h5 {
+  font-weight: normal;
+  margin-bottom: 100px;
+}
+
+#noMessagesImage {
+  float: left;
+  margin: 90px 0 0 140px;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+}
+
+#img {
+  float: left;
+  margin: 90px 0 0 140px;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+}
+.info {
+  text-align: left;
+  float: right;
+  margin: 40px 60px 0 0;
+  width: 405px;
+  overflow: hidden;
+}
+.nickname-chat {
+  overflow: hidden;
+}
