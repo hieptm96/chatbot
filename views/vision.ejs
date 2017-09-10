@@ -1,14 +1,153 @@
 <%- include('header') %>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/annyang/2.6.0/annyang.min.js"></script>
+  <style>
+    body {background-color: #fff;}
+    #vision {margin-top: 15px;}
+    #img-store img {width: 100%; height: auto;}
+  </style>
   <div id="vision">
     <div class="row">
-      <button>Submit</button>
+      <div class="col-sm-7" id="img-store">
+        <img src="/images/image_default.png" class="img-responsive" alt="">
+      </div>
+      <div class="col-sm-4 col-sm-offset-1">
+        <p class="text-center result">Your result</p>
+        <div class="pie_progress" role="progressbar">
+          <div class="pie_progress__number" style="color: #fff; z-index: 1;">0%</div>
+          <div class="pie_progress__label" style="color: #fff; z-index: 1;">Native Speaker</div>
+        </div>
+        <p>Speech recognized : <b><span id="speech"></span></b></p>
+      </div>
     </div>
   </div>
   <script>
-    $(document).ready(function() {
-      $('button').click(function() {
-        var url = '//api.flickr.com/services/rest/?method=flickr.photos.search&api_key=a828a6571bb4f0ff8890f7a386d61975&sort=interestingness-desc&per_page=9&format=json&callback=jsonFlickrApi&tags='+tag;
+    "use strict";
+    // first we make sure annyang started succesfully
+    if (annyang) {
+      var showFlickr = function(tag) {
+        // $('#flickrGallery').show();
+        // $('#flickrLoader p').text('Searching for '+tag).fadeIn('fast');
+        var url = 'https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=125bbfd25e96d2b4a032a80641321207&sort=interestingness-desc&per_page=9&format=json&callback=jsonFlickrApi&tags='+tag;
+        $.ajax({
+          type: 'GET',
+          url: url,
+          async: false,
+          jsonpCallback: 'jsonFlickrApi',
+          contentType: "application/json",
+          dataType: 'jsonp'
+        });
+        // scrollTo("#section_image_search");
+      };
+
+      // Declear array tags of image desciption return from Vision API
+      var tags = null;
+
+      var jsonFlickrApi = function(results) {
+        var photos = results.photos.photo;
+
+        var image_url = 'https://farm'+photos[0].farm+'.staticflickr.com/'+photos[0].server+'/'+photos[0].id+'_'+photos[0].secret+'_b.jpg';
+
+        if ($('img').length > 0) {
+          $('img').fadeOut(1000, function() {
+            $('img').remove();
+            $(document.createElement("img"))
+              .attr({ src: image_url })
+              .addClass("img-responsive")
+              .appendTo("#img-store");
+          });
+        } else {
+          $(document.createElement("img"))
+            .attr({ src: image_url })
+            .addClass("img-responsive")
+            .appendTo("#img-store");
+        }
+
+        tags = $.processImage(image_url);
+        console.log(tags);
+        $('.pie_progress').asPieProgress('reset');
+      };
+
+      // Call Computer vision API to recognize image infomation
+      $.extend({
+        processImage: function(image_url) {
+          var subscriptionKey = "97854677d72b4f919c93e9ea5c7b8eef";
+          var uriBase = "https://westcentralus.api.cognitive.microsoft.com/vision/v1.0/analyze";
+          // Request parameters.
+          var params = {
+              "visualFeatures": "Categories,Description,Color",
+              "details": "",
+              "language": "en",
+          };
+
+          var tags = null;
+
+          // Perform the REST API call.
+          $.ajax({
+              url: uriBase + "?" + $.param(params),
+              // Request headers.
+              beforeSend: function(xhrObj){
+                  xhrObj.setRequestHeader("Content-Type","application/json");
+                  xhrObj.setRequestHeader("Ocp-Apim-Subscription-Key", subscriptionKey);
+              },
+              type: "POST",
+              // Request body.
+              data: '{"url": ' + '"' + image_url + '"}',
+              async: !1,
+              success: function(data) {
+                tags = data.description.tags;
+              },
+              error: function(jqXHR, textStatus, errorThrown) {
+                var errorString = (errorThrown === "") ? "Error. " : errorThrown + " (" + jqXHR.status + "): ";
+                errorString += (jqXHR.responseText === "") ? "" : jQuery.parseJSON(jqXHR.responseText).message;
+                alert(errorString);
+              }
+          });
+          return tags;
+        }
+      });
+
+      var count = 0;
+      annyang.addCallback('result', function(phrases) {
+        if (phrases[0].search('show me') != 0) {
+          var speech = phrases[0];
+          $('#speech').text(phrases[0]);
+          // new String(tags[i].trim()).valueOf() == new String(speech.trim()).valueOf().toLowerCase()
+          if (tags != null && $.inArray(new String(speech.trim()).valueOf().toLowerCase(), tags) > -1) {
+            count++;
+            $('.pie_progress').asPieProgress('go', Math.floor(count / tags.length * 100));
+            // console.log('count = ' + count);
+          }
+        }
+      });
+
+      var commands = {
+        'show me *search':      showFlickr,
+      };
+
+      // annyang.debug();
+
+      annyang.addCommands(commands);
+
+      annyang.setLanguage('en');
+
+      annyang.start({ autoRestart: true, continuous: true });
+    } else {
+      // $(document).ready(function() {
+      //   $('#unsupported').fadeIn('fast');
+      // });
+    }
+
+    jQuery(function($) {
+      $('.pie_progress').asPieProgress({
+        namespace: 'pie_progress',
+        barcolor: '#e67e22',
+        barsize: '15',
+        speed: 50,
+        easing: 'ease',
+        trackcolor: '#fff',
+        fillcolor: '#34495e',
       });
     });
+
   </script>
 <%- include('footer') %>

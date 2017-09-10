@@ -1,4 +1,8 @@
 <%- include('header') %>
+  <link href="/vendor/ubold/assets/css/core.css" rel="stylesheet" type="text/css" />
+  <style>
+    /*.card-box {display: none;}*/
+  </style>
   <div id="speakbot">
     <div class="row">
       <section class="section">
@@ -19,14 +23,6 @@
               <ul class="conversation-list nicescroll">
                 <!-- chat conversation -->
               </ul>
-              <!-- <div class="row">
-                <div class="col-sm-9 chat-inputbar">
-                  <input type="text" class="form-control chat-input" placeholder="Enter your text">
-                </div>
-                <div class="col-sm-3 chat-send">
-                  <button type="submit" class="btn btn-md btn-info btn-block waves-effect waves-light">Send</button>
-                </div>
-              </div> -->
             </div>
           </div>
         </div> <!-- end col-->
@@ -55,8 +51,12 @@
     // recognition.maxAlternatives = 1;
     recognition.continuous = true;
     recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
 
     $('#start-speak').click(function() {
+      // $('.nomessages').hide(1000, function() {
+      //   $('.card-box').show();
+      // });
       recognition.start();
     });
 
@@ -71,20 +71,28 @@
       let text = e.results[last][0].transcript;
 
       console.log(text);
-      // socket.emit('speaker_input', {
-      //   user_text: text
-      // });
-      // $.ChatApp.user_save(text);
+      $.ChatApp.user_save(text);
+      socket.emit('user_speak', text);
     });
 
-    $('button').click(function() {
-      $.ChatApp.user_save($('.chat-input').val());
-      socket.emit('user_speak', {
-        user_text: $('.chat-input').val()
-      });
-    });
+    // $('button').click(function() {
+    //   $.ChatApp.user_save($('.chat-input').val());
+    //   socket.emit('user_speak', {
+    //     user_text: $('.chat-input').val()
+    //   });
+    // });
+
+    function synthVoice(text) {
+      const synth = window.speechSynthesis;
+      const utterance = new SpeechSynthesisUtterance();
+      utterance.text = text;
+      synth.speak(utterance);
+    }
 
     socket.on('bot_speak', function(data) {
+      synthVoice(data);
+
+      if(data == '') data = '(No answer...)';
       $.ChatApp.bot_save(data);
     });
 

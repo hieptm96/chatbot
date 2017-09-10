@@ -30,8 +30,7 @@ router.get('/chat', function(req, res, next) {
   res.io.on('connection', function(socket) {
     console.log('Client connected...');
     socket.on('user_speak', function(data) {
-      // console.log(data.user_text);
-      let request = mod.textRequest('How are you?', {
+      let request = mod.textRequest(data, {
         sessionId: session
       });
 
